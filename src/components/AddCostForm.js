@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-// ייבוא הרכיבים מהספרייה של MUI
+// Import MUI components from the library
 import { TextField, Button, MenuItem, Box, Alert } from '@mui/material';
-import { idb } from '../idb'; // ייבוא בסיס הנתונים שלנו
+import { idb } from '../idb'; // Import our database layer
 
 const AddCostForm = () => {
-    // יצירת State לניהול השדות בטופס (React Standard)
+    // Create state to manage form fields (React Standard)
     const [cost, setCost] = useState({
         sum: '',
         currency: 'USD',
@@ -12,22 +12,22 @@ const AddCostForm = () => {
         description: ''
     });
 
-    const [status, setStatus] = useState(null); // להצגת הודעת הצלחה/שגיאה
+    const [status, setStatus] = useState(null); // Show success/error message
 
-    // פונקציה שמתעדכנת בכל פעם שהמשתמש מקליד משהו
+    // Update state whenever the user types something
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCost({ ...cost, [name]: value });
     };
 
-    // פונקציית השליחה
+    // Submit function
     const handleSubmit = async (e) => {
-        e.preventDefault(); // מניעת ריענון הדף
+        e.preventDefault(); // Prevent page refresh
         try {
-            // קריאה לפונקציית ה-addCost שבנינו ב-idb.js
+            // Call the addCost function we created in idb.js
             await idb.addCost(cost);
             setStatus({ type: 'success', msg: 'Cost added successfully!' });
-            // איפוס הטופס
+            // Reset the form
             setCost({ sum: '', currency: 'USD', category: 'FOOD', description: '' });
         } catch (error) {
             setStatus({ type: 'error', msg: 'Failed to add cost.' });
@@ -36,7 +36,7 @@ const AddCostForm = () => {
 
     return (
         <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {/* שדה סכום - משתמשים ב-type="number" לוודא שהקלט מספרי */}
+            {/* Amount field - use type="number" to ensure numeric input */}
             <TextField
                 label="Sum"
                 name="sum"
@@ -47,7 +47,7 @@ const AddCostForm = () => {
                 fullWidth
             />
 
-            {/* שדה בחירת מטבע - Dropdown (Select) */}
+            {/* Currency selection field - Dropdown (Select) */}
             <TextField
                 select
                 label="Currency"
@@ -61,7 +61,7 @@ const AddCostForm = () => {
                 ))}
             </TextField>
 
-            {/* שדה בחירת קטגוריה */}
+            {/* Category selection field */}
             <TextField
                 select
                 label="Category"
@@ -89,7 +89,7 @@ const AddCostForm = () => {
                 Add Cost
             </Button>
 
-            {/* הצגת הודעה למשתמש אם הצליח או נכשל */}
+            {/* Show a message to the user if it succeeded or failed */}
             {status && <Alert severity={status.type}>{status.msg}</Alert>}
         </Box>
     );

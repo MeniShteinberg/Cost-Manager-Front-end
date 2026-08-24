@@ -6,10 +6,10 @@ import {
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { idb } from '../idb';
 
-// הגדרת צבעים לגרף העוגה
+// Define colors for the pie chart
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
-// סמלי מטבעות להצגה
+// Currency symbols for display
 const CURRENCY_SYMBOLS = {
     'USD': '$',
     'ILS': '₪',
@@ -18,29 +18,29 @@ const CURRENCY_SYMBOLS = {
 };
 
 const MonthlyReport = () => {
-    // 1. הגדרת מצב (State) עבור הפרמטרים של החיפוש
+    // 1. Define state for the search parameters
     const [params, setParams] = useState({
         year: new Date().getFullYear(),
         month: new Date().getMonth() + 1,
         currency: 'USD'
     });
 
-    // 2. מצב עבור תוצאות הדוח
+    // 2. State for report results
     const [reportData, setReportData] = useState(null);
     
-    // 3. מצב עבור נתוני גרף העוגה (קטגוריות)
+    // 3. State for pie chart data (categories)
     const [categoryData, setCategoryData] = useState(null);
 
-    // עדכון הפרמטרים כשהמשתמש משנה משהו בטופס
+    // Update parameters when the user changes something in the form
     const handleChange = (e) => {
         const { name, value } = e.target;
         setParams({ ...params, [name]: value });
     };
 
-    // 4. פונקציה להפעלת הדוח
+    // 4. Function to generate the report
     const handleGenerateReport = async () => {
         try {
-            // קריאה לפונקציית ה-getReport שבנינו ב-idb.js
+            // Call the getReport function we created in idb.js
             const result = await idb.getReport(
                 Number(params.year),
                 Number(params.month),
@@ -48,7 +48,7 @@ const MonthlyReport = () => {
             );
             setReportData(result);
             
-            // קבלת נתוני קטגוריות לגרף העוגה
+            // Retrieve category data for the pie chart
             const categoryResult = await idb.getCostsByCategory(
                 Number(params.year),
                 Number(params.month),
@@ -64,7 +64,7 @@ const MonthlyReport = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Typography variant="h6">Generate Monthly Report</Typography>
 
-            {/* שורת בחירת הפרמטרים */}
+            {/* Parameter selection row */}
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <TextField
                     label="Year"
@@ -106,7 +106,7 @@ const MonthlyReport = () => {
                 </Button>
             </Box>
 
-            {/* הצגת הטבלה רק אם יש נתונים */}
+            {/* Show the table only if there is data */}
             {reportData && (
                 <Box>
                     <TableContainer component={Paper} sx={{ mt: 2 }}>
@@ -128,7 +128,7 @@ const MonthlyReport = () => {
                                         <TableCell align="right">{cost.sum} {cost.currency}</TableCell>
                                     </TableRow>
                                 ))}
-                                {/* שורת סיכום סופי */}
+                                {/* Final summary row */}
                                 <TableRow sx={{ backgroundColor: '#e3f2fd' }}>
                                     <TableCell colSpan={3} sx={{ fontWeight: 'bold' }}>Total Cost (in {reportData.total.currency})</TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 'bold' }}>
@@ -141,7 +141,7 @@ const MonthlyReport = () => {
                 </Box>
             )}
 
-            {/* גרף עוגה - עלויות לפי קטגוריה */}
+            {/* Pie chart - costs by category */}
             {categoryData && categoryData.data.length > 0 && (
                 <Box sx={{ mt: 4 }}>
                     <Typography variant="h6" gutterBottom>
@@ -175,7 +175,7 @@ const MonthlyReport = () => {
                 </Box>
             )}
 
-            {/* הודעה כאשר אין נתונים */}
+            {/* Message when there is no data */}
             {categoryData && categoryData.data.length === 0 && (
                 <Typography color="textSecondary" sx={{ mt: 2 }}>
                     No costs found for this month.

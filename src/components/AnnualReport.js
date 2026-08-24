@@ -11,22 +11,22 @@ const CURRENCY_SYMBOLS = {
 };
 
 const AnnualReport = () => {
-    // פרמטרים של הדוח
+    // Report parameters
     const [params, setParams] = useState({
         year: new Date().getFullYear(),
         currency: 'USD'
     });
 
-    // מצב עבור נתוני שנה
+    // State for annual data
     const [annualData, setAnnualData] = useState(null);
 
-    // עדכון הפרמטרים כשהמשתמש משנה משהו בטופס
+    // Update parameters when the user changes something in the form
     const handleChange = (e) => {
         const { name, value } = e.target;
         setParams({ ...params, [name]: value });
     };
 
-    // פונקציה להפעלת הדוח
+    // Function to generate the report
     const handleGenerateReport = async () => {
         try {
             const result = await idb.getAnnualReport(
@@ -39,7 +39,7 @@ const AnnualReport = () => {
         }
     };
 
-    // חישוב סך הכל לשנה
+    // Calculate the total for the year
     const calculateYearTotal = () => {
         if (!annualData || !annualData.data) return 0;
         return annualData.data.reduce((sum, month) => sum + month.total, 0).toFixed(2);
@@ -49,7 +49,7 @@ const AnnualReport = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Typography variant="h6">Annual Overview</Typography>
 
-            {/* שורת בחירת הפרמטרים */}
+            {/* Parameter selection row */}
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <TextField
                     label="Year"
@@ -78,14 +78,14 @@ const AnnualReport = () => {
                 </Button>
             </Box>
 
-            {/* גרף עוגה - סקירה שנתית */}
+            {/* Bar chart - annual overview */}
             {annualData && (
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="subtitle1" gutterBottom>
                         Monthly Costs for {annualData.year} (in {annualData.currency})
                     </Typography>
                     
-                    {/* סיכום סך הכל לשנה */}
+                    {/* Total for the year summary */}
                     <Paper sx={{ p: 2, mb: 2, backgroundColor: '#e3f2fd' }}>
                         <Typography variant="h6">
                             Total for {annualData.year}: {CURRENCY_SYMBOLS[annualData.currency]}{calculateYearTotal()}
@@ -123,7 +123,7 @@ const AnnualReport = () => {
                         </ResponsiveContainer>
                     </Paper>
 
-                    {/* טבלת פירוט חודשי */}
+                    {/* Monthly breakdown table */}
                     <Paper sx={{ p: 2, mt: 2 }}>
                         <Typography variant="subtitle2" gutterBottom>
                             Monthly Breakdown

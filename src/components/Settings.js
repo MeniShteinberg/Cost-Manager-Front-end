@@ -5,7 +5,7 @@ const Settings = () => {
     const [url, setUrl] = useState('');
     const [status, setStatus] = useState(null);
 
-    // טעינת ה-URL הקיים מהזיכרון של הדפדפן בטעינה הראשונה
+    // Load the existing URL from browser storage on first load
     useEffect(() => {
         const savedUrl = localStorage.getItem('currency_url') || '';
         setUrl(savedUrl);
@@ -13,7 +13,7 @@ const Settings = () => {
 
     const handleSave = () => {
         try {
-            // שמירה ב-localStorage - זה נשמר גם אם מרעננים את הדף
+            // Save to localStorage - it is preserved even if the page is refreshed
             localStorage.setItem('currency_url', url);
             setStatus({ type: 'success', msg: 'URL saved successfully!' });
         } catch (e) {

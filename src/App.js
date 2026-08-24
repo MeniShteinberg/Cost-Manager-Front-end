@@ -32,7 +32,7 @@ function App() {
             {tabValue === 0 && <AddCostForm />}
             {tabValue === 1 && <MonthlyReport />}
             {tabValue === 2 && <AnnualReport />}
-            {tabValue === 3 && <Settings />} {/* השורה ששאלת עליה */}
+            {tabValue === 3 && <Settings />}
           </Box>
         </Box>
       </Container>

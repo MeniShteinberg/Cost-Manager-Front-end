@@ -1,5 +1,5 @@
 // src/idb.js
-// מודול IndexedDB מאוחד - תומך גם בייבוא ES6 וגם בשימוש וניל JavaScript
+// Unified IndexedDB module - supports both ES6 imports and vanilla JavaScript usage
 
 const dbName = "costsdb";
 const dbVersion = 1;
@@ -7,8 +7,8 @@ const dbVersion = 1;
 const DEFAULT_RATES_URL = "https://raw.githubusercontent.com/Sapeez/Cost-Manager-FED/master/public/exchange-rates.json";
 
 /**
- * פותח את מסד הנתונים IndexedDB ויוצר חנויות אובייקטים אם נדרש
- * @returns {Promise<IDBDatabase>} מופע מסד הנתונים
+ * Opens the IndexedDB database and creates object stores if needed
+ * @returns {Promise<IDBDatabase>} Database instance
  */
 function openDB() {
     return new Promise((resolve, reject) => {
@@ -27,8 +27,8 @@ function openDB() {
 }
 
 /**
- * מביא שערי חליפין מכתובת URL מוגדרת על ידי המשתמש או מברירת מחדל
- * @returns {Promise<Object>} אובייקט שערי חליפין
+ * Fetches exchange rates from a user-defined URL or falls back to the default
+ * @returns {Promise<Object>} Exchange rate object
  */
 async function getExchangeRates() {
     const userUrl = localStorage.getItem("currency_url");
@@ -40,7 +40,7 @@ async function getExchangeRates() {
                 return await response.json();
             }
         } catch (e) {
-            console.error("נכשל בהבאת שערים מכתובת המשתמש, מנסה ברירת מחדל");
+            console.error("Failed to fetch rates from the user URL, trying default");
         }
     }
 
@@ -49,13 +49,13 @@ async function getExchangeRates() {
 }
 
 /**
- * עטיפה ל-IndexedDB לפעולות ניהול עלויות
+ * Wrapper for IndexedDB cost management operations
  */
 const idb = {
     /**
-     * מוסיף רשומת עלות חדשה למסד הנתונים
-     * @param {Object} cost - אובייקט העלות עם סכום, מטבע, קטגוריה, תיאור
-     * @returns {Promise<Object>} פריט העלות שנוסף
+     * Adds a new cost record to the database
+     * @param {Object} cost - Cost object with amount, currency, category, and description
+     * @returns {Promise<Object>} Added cost item
      */
     addCost: async (cost) => {
         const db = await openDB();
@@ -68,7 +68,7 @@ const idb = {
                 currency: cost.currency,
                 category: cost.category,
                 description: cost.description,
-                created_at: new Date().getTime() // שומרים Timestamp שיהיה קל למיין
+                created_at: new Date().getTime() // Save a timestamp that is easy to sort
             };
 
             const request = store.add(item);
@@ -79,11 +79,11 @@ const idb = {
     },
 
     /**
-     * מקבל דוח חודשי של עלויות
-     * @param {number} year - השנה לסינון
-     * @param {number} month - החודש לסינון (1-12)
-     * @param {string} targetCurrency - המטבע להמרת הסכומים
-     * @returns {Promise<Object>} דוח עם עלויות וסה"כ
+     * Gets a monthly report of costs
+     * @param {number} year - The year to filter by
+     * @param {number} month - The month to filter by (1-12)
+     * @param {string} targetCurrency - Currency to convert amounts into
+     * @returns {Promise<Object>} Report with costs and totals
      */
     getReport: async (year, month, targetCurrency = "USD") => {
         const db = await openDB();
@@ -108,7 +108,7 @@ const idb = {
                         currency: cost.currency,
                         category: cost.category,
                         description: cost.description,
-                        date: new Date(cost.created_at).getDate() // שומרים רק את היום בחודש
+                        date: new Date(cost.created_at).getDate() // Keep only the day of the month
                     };
                 });
 
@@ -132,11 +132,11 @@ const idb = {
     },
 
     /**
-     * מקבל עלויות מקובצות לפי קטגוריה עבור חודש מסוים
-     * @param {number} year - השנה לסינון
-     * @param {number} month - החודש לסינון (1-12)
-     * @param {string} targetCurrency - המטבע להמרת הסכומים
-     * @returns {Promise<Object>} נתוני סיכום קטגוריות
+     * Gets costs grouped by category for a specific month
+     * @param {number} year - The year to filter by
+     * @param {number} month - The month to filter by (1-12)
+     * @param {string} targetCurrency - Currency to convert amounts into
+     * @returns {Promise<Object>} Category summary data
      */
     getCostsByCategory: async (year, month, targetCurrency = "USD") => {
         const db = await openDB();
@@ -184,10 +184,10 @@ const idb = {
     },
 
     /**
-     * מקבל דוח שנתי עם סיכומים חודשיים
-     * @param {number} year - השנה לקבלת הדוח
-     * @param {string} targetCurrency - המטבע להמרת הסכומים
-     * @returns {Promise<Object>} נתונים שנתיים עם פירוט חודשי
+     * Gets an annual report with monthly totals
+     * @param {number} year - The year to generate the report for
+     * @param {string} targetCurrency - Currency to convert amounts into
+     * @returns {Promise<Object>} Annual data with monthly details
      */
     getAnnualReport: async (year, targetCurrency = "USD") => {
         const db = await openDB();
@@ -240,10 +240,10 @@ const idb = {
     }
 };
 
-// ייצוא מודול ES6 (עבור React ו-bundlers מודרניים)
+// Export ES6 module (for React and modern bundlers)
 export { idb };
 
-// מצרף ל-window לשימוש JavaScript vanilla (תגיות script)
+// Attach to window for vanilla JavaScript usage (script tags)
 if (typeof window !== 'undefined') {
     window.idb = idb;
 }
