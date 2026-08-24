@@ -4,7 +4,7 @@
 const dbName = "costsdb";
 const dbVersion = 1;
 
-const DEFAULT_RATES_URL = "https://raw.githubusercontent.com/Sapeez/Cost-Manager-FED/master/public/exchange-rates.json";
+const DEFAULT_RATES_URL = "https://raw.githubusercontent.com/MeniShteinberg/Cost-Manager-Front-end/refs/heads/main/public/exchange-rates.json";
 
 /**
  * Opens the IndexedDB database and creates object stores if needed
