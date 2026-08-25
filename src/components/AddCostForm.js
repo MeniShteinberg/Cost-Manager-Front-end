@@ -23,6 +23,12 @@ const AddCostForm = () => {
     // Submit function
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent page refresh
+
+        if (Number(cost.sum) <= 0) {
+            setStatus({ type: 'error', msg: 'Sum must be a positive number.' });
+            return;
+        }
+
         try {
             // Call the addCost function we created in db.js
             await db.addCost(cost);

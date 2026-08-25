@@ -54,6 +54,12 @@ const db = {
      * @returns {Promise<Object>} Added cost item
      */
     addCost: async (cost) => {
+
+        const numericSum = Number(cost.sum);
+        if (numericSum <= 0 || isNaN(numericSum)) {
+            return Promise.reject("Error: Sum must be a positive number.");
+        }
+        
         const db = await openCostsDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction(["costs"], "readwrite");
