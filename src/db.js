@@ -15,7 +15,7 @@ async function getExchangeRates() {
                 return await response.json();
             }
         } catch (e) {
-            console.error("The real error is:", e);
+            console.error("Failed to fetch rates from the user URL, trying default");
         }
     }
 
