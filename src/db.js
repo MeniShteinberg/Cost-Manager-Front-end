@@ -3,22 +3,6 @@
 
 const DEFAULT_RATES_URL = "https://raw.githubusercontent.com/MeniShteinberg/Cost-Manager-Front-end/refs/heads/main/public/exchange-rates.json";
 
-function openCostsDB(databaseName = "costsdb", databaseVersion = 1) {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(databaseName, databaseVersion);
-
-        request.onupgradeneeded = (event) => {
-            const database = event.target.result;
-            if (!database.objectStoreNames.contains("costs")) {
-                database.createObjectStore("costs", { keyPath: "id", autoIncrement: true });
-            }
-        };
-
-        request.onsuccess = (event) => resolve(event.target.result);
-        request.onerror = (event) => reject("Error opening DB: " + event.target.error);
-    });
-}
-
 /**
  * Fetches exchange rates from a user-defined URL or falls back to the default
  * @returns {Promise<Object>} Exchange rate object
@@ -46,7 +30,10 @@ async function getExchangeRates() {
  */
 const db = {
 
-    openCostsDB: openCostsDB,
+    openCostsDB: function(databaseName = "costsdb", databaseVersion = 1) {
+        return this; 
+    },
+
     getExchangeRates: getExchangeRates,
 
     /**
@@ -55,30 +42,27 @@ const db = {
      * @returns {Promise<Object>} Added cost item
      */
     addCost: async (cost) => {
-
         const numericSum = Number(cost.sum);
         if (numericSum <= 0 || isNaN(numericSum)) {
             return Promise.reject("Error: Sum must be a positive number.");
         }
-        
-        const database = await openCostsDB();
-        return new Promise((resolve, reject) => {
-            const transaction = database.transaction(["costs"], "readwrite");
-            const store = transaction.objectStore("costs");
 
-            const item = {
-                sum: Number(cost.sum),
-                currency: String(cost.currency),
-                category: String(cost.category),
-                description: String(cost.description),
-                createdAt: new Date().getTime() // Save a timestamp that is easy to sort
-            };
+        const storedData = localStorage.getItem("costs");
+        const allCosts = storedData ? JSON.parse(storedData) : [];
 
-            const request = store.add(item);
+        const item = {
+            id: new Date().getTime(),
+            sum: Number(cost.sum),
+            currency: String(cost.currency),
+            category: String(cost.category),
+            description: String(cost.description),
+            createdAt: new Date().getTime()
+        };
 
-            request.onsuccess = () => resolve(item);
-            request.onerror = () => reject("Error adding cost");
-        });
+        allCosts.push(item);
+        localStorage.setItem("costs", JSON.stringify(allCosts));
+
+        return item;
     },
 
     /**
@@ -89,49 +73,38 @@ const db = {
      * @returns {Promise<Object>} Report with costs and totals
      */
     getReport: async (targetCurrency = "USD", year = new Date().getFullYear(), month = new Date().getMonth() + 1) => {
-        const database = await openCostsDB();
         const rates = await getExchangeRates();
+        const storedData = localStorage.getItem("costs");
+        const allCosts = storedData ? JSON.parse(storedData) : [];
 
-        return new Promise((resolve, reject) => {
-            const transaction = database.transaction(["costs"], "readonly");
-            const store = transaction.objectStore("costs");
-            const request = store.getAll();
-
-            request.onsuccess = () => {
-                const allCosts = request.result;
-
-                const filteredCosts = allCosts.filter(cost => {
-                    const date = new Date(cost.createdAt);
-                    return date.getFullYear() === year && (date.getMonth() + 1) === month;
-                });
-
-                const processedCosts = filteredCosts.map(cost => {
-                    return {
-                        sum: cost.sum,
-                        currency: cost.currency,
-                        category: cost.category,
-                        description: cost.description,
-                        date: { day: new Date(cost.createdAt).getDate() } // Keep only the day of the month
-                    };
-                });
-
-                let total = 0;
-                filteredCosts.forEach(cost => {
-                    const inUSD = cost.sum / rates[cost.currency];
-                    const inTarget = inUSD * rates[targetCurrency];
-                    total += inTarget;
-                });
-
-                resolve({
-                    year,
-                    month,
-                    costs: processedCosts,
-                    total: { currency: targetCurrency, sum: parseFloat(total.toFixed(2)) }
-                });
-            };
-
-            request.onerror = () => reject("Error getting report");
+        const filteredCosts = allCosts.filter(cost => {
+            const date = new Date(cost.createdAt);
+            return date.getFullYear() === year && (date.getMonth() + 1) === month;
         });
+
+        const processedCosts = filteredCosts.map(cost => {
+            return {
+                sum: cost.sum,
+                currency: cost.currency,
+                category: cost.category,
+                description: cost.description,
+                date: { day: new Date(cost.createdAt).getDate() }
+            };
+        });
+
+        let total = 0;
+        filteredCosts.forEach(cost => {
+            const inUSD = cost.sum / rates[cost.currency];
+            const inTarget = inUSD * rates[targetCurrency];
+            total += inTarget;
+        });
+
+        return {
+            year,
+            month,
+            costs: processedCosts,
+            total: { currency: targetCurrency, sum: parseFloat(total.toFixed(2)) }
+        };
     },
 
     /**
@@ -142,48 +115,37 @@ const db = {
      * @returns {Promise<Object>} Category summary data
      */
     getCostsByCategory: async (year, month, targetCurrency = "USD") => {
-        const database = await openCostsDB();
         const rates = await getExchangeRates();
+        const storedData = localStorage.getItem("costs");
+        const allCosts = storedData ? JSON.parse(storedData) : [];
 
-        return new Promise((resolve, reject) => {
-            const transaction = database.transaction(["costs"], "readonly");
-            const store = transaction.objectStore("costs");
-            const request = store.getAll();
-
-            request.onsuccess = () => {
-                const allCosts = request.result;
-
-                const filteredCosts = allCosts.filter(cost => {
-                    const date = new Date(cost.createdAt);
-                    return date.getFullYear() === year && (date.getMonth() + 1) === month;
-                });
-
-                const categoryTotals = {};
-                filteredCosts.forEach(cost => {
-                    const inUSD = cost.sum / rates[cost.currency];
-                    const inTarget = inUSD * rates[targetCurrency];
-
-                    if (!categoryTotals[cost.category]) {
-                        categoryTotals[cost.category] = 0;
-                    }
-                    categoryTotals[cost.category] += inTarget;
-                });
-
-                const result = Object.entries(categoryTotals).map(([category, total]) => ({
-                    category,
-                    total: parseFloat(total.toFixed(2))
-                }));
-
-                resolve({
-                    year,
-                    month,
-                    currency: targetCurrency,
-                    data: result
-                });
-            };
-
-            request.onerror = () => reject("Error getting category data");
+        const filteredCosts = allCosts.filter(cost => {
+            const date = new Date(cost.createdAt);
+            return date.getFullYear() === year && (date.getMonth() + 1) === month;
         });
+
+        const categoryTotals = {};
+        filteredCosts.forEach(cost => {
+            const inUSD = cost.sum / rates[cost.currency];
+            const inTarget = inUSD * rates[targetCurrency];
+
+            if (!categoryTotals[cost.category]) {
+                categoryTotals[cost.category] = 0;
+            }
+            categoryTotals[cost.category] += inTarget;
+        });
+
+        const result = Object.entries(categoryTotals).map(([category, total]) => ({
+            category,
+            total: parseFloat(total.toFixed(2))
+        }));
+
+        return {
+            year,
+            month,
+            currency: targetCurrency,
+            data: result
+        };
     },
 
     /**
@@ -193,53 +155,41 @@ const db = {
      * @returns {Promise<Object>} Annual data with monthly details
      */
     getAnnualReport: async (year, targetCurrency = "USD") => {
-        const database = await openCostsDB();
         const rates = await getExchangeRates();
+        const storedData = localStorage.getItem("costs");
+        const allCosts = storedData ? JSON.parse(storedData) : [];
 
-        return new Promise((resolve, reject) => {
-            const transaction = database.transaction(["costs"], "readonly");
-            const store = transaction.objectStore("costs");
-            const request = store.getAll();
-
-            request.onsuccess = () => {
-                const allCosts = request.result;
-
-                const filteredCosts = allCosts.filter(cost => {
-                    const date = new Date(cost.createdAt);
-                    return date.getFullYear() === year;
-                });
-
-                const monthlyTotals = {};
-                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                monthNames.forEach((name, index) => {
-                    monthlyTotals[index + 1] = { month: name, total: 0 };
-                });
-
-                filteredCosts.forEach(cost => {
-                    const date = new Date(cost.createdAt);
-                    const month = date.getMonth() + 1;
-
-                    const inUSD = cost.sum / rates[cost.currency];
-                    const inTarget = inUSD * rates[targetCurrency];
-                    
-                    monthlyTotals[month].total += inTarget;
-                });
-
-                const result = Object.values(monthlyTotals).map(item => ({
-                    ...item,
-                    total: parseFloat(item.total.toFixed(2))
-                }));
-
-                resolve({
-                    year,
-                    currency: targetCurrency,
-                    data: result
-                });
-            };
-
-            request.onerror = () => reject("Error getting annual data");
+        const filteredCosts = allCosts.filter(cost => {
+            const date = new Date(cost.createdAt);
+            return date.getFullYear() === year;
         });
+
+        const monthlyTotals = {};
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        monthNames.forEach((name, index) => {
+            monthlyTotals[index + 1] = { month: name, total: 0 };
+        });
+
+        filteredCosts.forEach(cost => {
+            const date = new Date(cost.createdAt);
+            const month = date.getMonth() + 1;
+
+            const inUSD = cost.sum / rates[cost.currency];
+            const inTarget = inUSD * rates[targetCurrency];
+            
+            monthlyTotals[month].total += inTarget;
+        });
+
+        const result = Object.values(monthlyTotals).map(item => ({
+            ...item,
+            total: parseFloat(item.total.toFixed(2))
+        }));
+
+        return {
+            year,
+            currency: targetCurrency,
+            data: result
+        };
     }
 };
 
