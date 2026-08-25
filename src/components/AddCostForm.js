@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // Import MUI components from the library
-import { TextField, Button, MenuItem, Box, Alert } from '@mui/material';
+import { TextField, Button, MenuItem, Box, Alert, Typography } from '@mui/material';
 import { db } from '../db'; // Import our database layer
 
 const AddCostForm = () => {
@@ -42,6 +42,7 @@ const AddCostForm = () => {
 
     return (
         <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Typography variant="h6">Add New Cost</Typography>
             {/* Amount field - use type="number" to ensure numeric input */}
             <TextField
                 label="Sum"

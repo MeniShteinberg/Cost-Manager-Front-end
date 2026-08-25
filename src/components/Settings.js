@@ -23,21 +23,22 @@ const Settings = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Typography variant="h6">Configuration</Typography>
+            
+            <Typography variant="h6">Change Settings</Typography>
             <Typography variant="body2" color="textSecondary">
-                Enter the URL for getting currency exchange rates (JSON format).
+                Enter the URL for getting currency exchange rates (in JSON format).
             </Typography>
 
             <TextField
-                label="Exchange Rates URL"
+                label="Paste the URL here"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 fullWidth
                 placeholder="https://example.com/rates.json"
             />
 
-            <Button variant="contained" onClick={handleSave} sx={{ width: 'fit-content' }}>
-                Save Settings
+            <Button variant="contained" onClick={handleSave} sx={{ width: 150 }}>
+                Save
             </Button>
 
             {status && <Alert severity={status.type}>{status.msg}</Alert>}

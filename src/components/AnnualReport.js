@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button, MenuItem, Typography, Paper } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { db } from '../db';
 
 const CURRENCY_SYMBOLS = {
@@ -47,7 +47,7 @@ const AnnualReport = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Typography variant="h6">Annual Overview</Typography>
+            <Typography variant="h6">Your Annual Overview</Typography>
 
             {/* Parameter selection row */}
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
@@ -74,19 +74,16 @@ const AnnualReport = () => {
                 </TextField>
 
                 <Button variant="contained" onClick={handleGenerateReport}>
-                    Show Report
+                    Show Overview
                 </Button>
             </Box>
 
             {/* Bar chart - annual overview */}
             {annualData && (
                 <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle1" gutterBottom>
-                        Monthly Costs for {annualData.year} (in {annualData.currency})
-                    </Typography>
                     
                     {/* Total for the year summary */}
-                    <Paper sx={{ p: 2, mb: 2, backgroundColor: '#e3f2fd' }}>
+                    <Paper sx={{ p: 2, mb: 2, backgroundColor: '#d2dbe1'}}>
                         <Typography variant="h6">
                             Total for {annualData.year}: {CURRENCY_SYMBOLS[annualData.currency]}{calculateYearTotal()}
                         </Typography>
@@ -112,42 +109,13 @@ const AnnualReport = () => {
                                     formatter={(value) => [`${CURRENCY_SYMBOLS[annualData.currency]}${value}`, 'Total']}
                                     labelFormatter={(label) => `Month: ${label}`}
                                 />
-                                <Legend />
                                 <Bar 
-                                    dataKey="total" 
-                                    name="Monthly Cost" 
+                                    dataKey="total"
                                     fill="#1976d2" 
                                     radius={[4, 4, 0, 0]}
                                 />
                             </BarChart>
                         </ResponsiveContainer>
-                    </Paper>
-
-                    {/* Monthly breakdown table */}
-                    <Paper sx={{ p: 2, mt: 2 }}>
-                        <Typography variant="subtitle2" gutterBottom>
-                            Monthly Breakdown
-                        </Typography>
-                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1 }}>
-                            {annualData.data.map((item) => (
-                                <Box 
-                                    key={item.month} 
-                                    sx={{ 
-                                        p: 1.5, 
-                                        backgroundColor: item.total > 0 ? '#f5f5f5' : '#fafafa',
-                                        borderRadius: 1,
-                                        textAlign: 'center'
-                                    }}
-                                >
-                                    <Typography variant="body2" color="textSecondary">
-                                        {item.month}
-                                    </Typography>
-                                    <Typography variant="body1" fontWeight="medium">
-                                        {CURRENCY_SYMBOLS[annualData.currency]}{item.total}
-                                    </Typography>
-                                </Box>
-                            ))}
-                        </Box>
                     </Paper>
                 </Box>
             )}

@@ -7,7 +7,7 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recha
 import { db } from '../db';
 
 // Define colors for the pie chart
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+const COLORS = ['#64748b', '#44b9eb', '#41c796', '#fbbf24', '#f47f7f', '#a78bfa'];
 
 // Currency symbols for display
 const CURRENCY_SYMBOLS = {
@@ -62,7 +62,7 @@ const MonthlyReport = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Typography variant="h6">Generate Monthly Report</Typography>
+            <Typography variant="h6">Your Monthly Report</Typography>
 
             {/* Parameter selection row */}
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
@@ -129,8 +129,8 @@ const MonthlyReport = () => {
                                     </TableRow>
                                 ))}
                                 {/* Final summary row */}
-                                <TableRow sx={{ backgroundColor: '#e3f2fd' }}>
-                                    <TableCell colSpan={3} sx={{ fontWeight: 'bold' }}>Total Cost (in {reportData.total.currency})</TableCell>
+                                <TableRow sx={{ backgroundColor: '#d2dbe1' }}>
+                                    <TableCell colSpan={3} sx={{ fontWeight: 'bold' }}>Total (in {reportData.total.currency})</TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 'bold' }}>
                                         {CURRENCY_SYMBOLS[reportData.total.currency]}{reportData.total.sum}
                                     </TableCell>
@@ -145,7 +145,7 @@ const MonthlyReport = () => {
             {categoryData && categoryData.data.length > 0 && (
                 <Box sx={{ mt: 4 }}>
                     <Typography variant="h6" gutterBottom>
-                        Costs by Category - {categoryData.month}/{categoryData.year}
+                        Category Breakdown {categoryData.month}/{categoryData.year}
                     </Typography>
                     <Paper sx={{ p: 2 }}>
                         <ResponsiveContainer width="100%" height={350}>
