@@ -1,5 +1,3 @@
-// src/db.js
-// Unified IndexedDB module - supports both ES6 imports and vanilla JavaScript usage
 
 const DEFAULT_RATES_URL = "https://raw.githubusercontent.com/MeniShteinberg/Cost-Manager-Front-end/refs/heads/main/public/exchange-rates.json";
 
@@ -30,11 +28,10 @@ async function getExchangeRates() {
  */
 const db = {
 
-    openCostsDB: function(databaseName = "costsdb", databaseVersion = 1) {
-        return this; 
-    },
-
     getExchangeRates: getExchangeRates,
+
+    openCostsDB: function(databaseName = "costsdb", databaseVersion = 1) {
+        return {
 
     /**
      * Adds a new cost record to the database
@@ -189,6 +186,8 @@ const db = {
             year,
             currency: targetCurrency,
             data: result
+        };
+    }
         };
     }
 };

@@ -31,7 +31,8 @@ const AddCostForm = () => {
 
         try {
             // Call the addCost function we created in db.js
-            await db.addCost(cost);
+            const myDb = db.openCostsDB();
+            await myDb.addCost(cost);
             setStatus({ type: 'success', msg: 'Cost added successfully!' });
             // Reset the form
             setCost({ sum: '', currency: 'USD', category: 'FOOD', description: '' });

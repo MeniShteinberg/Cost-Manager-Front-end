@@ -41,7 +41,8 @@ const MonthlyReport = () => {
     const handleGenerateReport = async () => {
         try {
             // Call the getReport function we created in db.js
-            const result = await db.getReport(
+            const myDb = db.openCostsDB();
+            const result = await myDb.getReport(
                 params.currency,
                 Number(params.year),
                 Number(params.month)
@@ -49,7 +50,7 @@ const MonthlyReport = () => {
             setReportData(result);
             
             // Retrieve category data for the pie chart
-            const categoryResult = await db.getCostsByCategory(
+            const categoryResult = await myDb.getCostsByCategory(
                 Number(params.year),
                 Number(params.month),
                 params.currency
