@@ -1,5 +1,5 @@
-## Smart Spend
-# My Personal Cost Manager
+# Smart Spend
+## My Personal Cost Manager
 
 ## Overview
 A front-end web application for managing personal costs, developed as a final project in Front-End Development. The user interface is in English, and the main currency is USD.
