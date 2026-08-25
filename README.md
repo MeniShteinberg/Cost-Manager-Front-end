@@ -1,8 +1,7 @@
 ## Smart Spend - My Personal Cost Manager
 
 ## Overview
-A front-end web application for managing personal costs.
-The user interface is in English, and the main currency is USD.
+A front-end web application for managing personal costs. The main currency is USD.
 
 ## Features
 * **Add Cost Items:** Users can add new expenses by specifying the sum, currency, category, and description. 
