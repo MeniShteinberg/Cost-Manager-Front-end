@@ -1,18 +1,14 @@
 // src/db.js
 // Unified IndexedDB module - supports both ES6 imports and vanilla JavaScript usage
 
-const dbName = "costsdb";
-const dbVersion = 1;
+const databaseName = "costsdb";
+const databaseVersion = 1;
 
 const DEFAULT_RATES_URL = "https://raw.githubusercontent.com/MeniShteinberg/Cost-Manager-Front-end/refs/heads/main/public/exchange-rates.json";
 
-/**
- * Opens the IndexedDB database and creates object stores if needed
- * @returns {Promise<IDBDatabase>} Database instance
- */
-function openDB() {
+function openCostsDB() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open(dbName, dbVersion);
+        const request = indexedDB.open(databaseName, databaseVersion);
 
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
@@ -58,7 +54,7 @@ const db = {
      * @returns {Promise<Object>} Added cost item
      */
     addCost: async (cost) => {
-        const db = await openDB();
+        const db = await openCostsDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction(["costs"], "readwrite");
             const store = transaction.objectStore("costs");
@@ -86,7 +82,7 @@ const db = {
      * @returns {Promise<Object>} Report with costs and totals
      */
     getReport: async (year, month, targetCurrency = "USD") => {
-        const db = await openDB();
+        const db = await openCostsDB();
         const rates = await getExchangeRates();
 
         return new Promise((resolve, reject) => {
@@ -139,7 +135,7 @@ const db = {
      * @returns {Promise<Object>} Category summary data
      */
     getCostsByCategory: async (year, month, targetCurrency = "USD") => {
-        const db = await openDB();
+        const db = await openCostsDB();
         const rates = await getExchangeRates();
 
         return new Promise((resolve, reject) => {
@@ -190,7 +186,7 @@ const db = {
      * @returns {Promise<Object>} Annual data with monthly details
      */
     getAnnualReport: async (year, targetCurrency = "USD") => {
-        const db = await openDB();
+        const db = await openCostsDB();
         const rates = await getExchangeRates();
 
         return new Promise((resolve, reject) => {
