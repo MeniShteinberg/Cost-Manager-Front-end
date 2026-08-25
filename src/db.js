@@ -61,9 +61,9 @@ const db = {
 
             const item = {
                 sum: Number(cost.sum),
-                currency: cost.currency,
-                category: cost.category,
-                description: cost.description,
+                currency: String(cost.currency),
+                category: String(cost.category),
+                description: String(cost.description),
                 createdAt: new Date().getTime() // Save a timestamp that is easy to sort
             };
 

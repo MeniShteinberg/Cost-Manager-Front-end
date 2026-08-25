@@ -82,6 +82,7 @@ const AddCostForm = () => {
                 onChange={handleChange}
                 multiline
                 rows={2}
+                required
                 fullWidth
             />
 
