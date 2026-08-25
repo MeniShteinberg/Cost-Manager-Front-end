@@ -68,7 +68,7 @@ const idb = {
                 currency: cost.currency,
                 category: cost.category,
                 description: cost.description,
-                created_at: new Date().getTime() // Save a timestamp that is easy to sort
+                createdAt: new Date().getTime() // Save a timestamp that is easy to sort
             };
 
             const request = store.add(item);
@@ -98,7 +98,7 @@ const idb = {
                 const allCosts = request.result;
 
                 const filteredCosts = allCosts.filter(cost => {
-                    const date = new Date(cost.created_at);
+                    const date = new Date(cost.createdAt);
                     return date.getFullYear() === year && (date.getMonth() + 1) === month;
                 });
 
@@ -108,7 +108,7 @@ const idb = {
                         currency: cost.currency,
                         category: cost.category,
                         description: cost.description,
-                        date: new Date(cost.created_at).getDate() // Keep only the day of the month
+                        date: new Date(cost.createdAt).getDate() // Keep only the day of the month
                     };
                 });
 
@@ -151,7 +151,7 @@ const idb = {
                 const allCosts = request.result;
 
                 const filteredCosts = allCosts.filter(cost => {
-                    const date = new Date(cost.created_at);
+                    const date = new Date(cost.createdAt);
                     return date.getFullYear() === year && (date.getMonth() + 1) === month;
                 });
 
@@ -202,7 +202,7 @@ const idb = {
                 const allCosts = request.result;
 
                 const filteredCosts = allCosts.filter(cost => {
-                    const date = new Date(cost.created_at);
+                    const date = new Date(cost.createdAt);
                     return date.getFullYear() === year;
                 });
 
@@ -214,7 +214,7 @@ const idb = {
                 });
 
                 filteredCosts.forEach(cost => {
-                    const date = new Date(cost.created_at);
+                    const date = new Date(cost.createdAt);
                     const month = date.getMonth() + 1;
 
                     const inUSD = cost.sum / rates[cost.currency];
