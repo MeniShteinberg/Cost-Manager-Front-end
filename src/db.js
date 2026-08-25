@@ -1,19 +1,16 @@
 // src/db.js
 // Unified IndexedDB module - supports both ES6 imports and vanilla JavaScript usage
 
-const databaseName = "costsdb";
-const databaseVersion = 1;
-
 const DEFAULT_RATES_URL = "https://raw.githubusercontent.com/MeniShteinberg/Cost-Manager-Front-end/refs/heads/main/public/exchange-rates.json";
 
-function openCostsDB() {
+function openCostsDB(databaseName = "costsdb", databaseVersion = 1) {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(databaseName, databaseVersion);
 
         request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains("costs")) {
-                db.createObjectStore("costs", { keyPath: "id", autoIncrement: true });
+            const database = event.target.result;
+            if (!database.objectStoreNames.contains("costs")) {
+                database.createObjectStore("costs", { keyPath: "id", autoIncrement: true });
             }
         };
 
@@ -48,6 +45,10 @@ async function getExchangeRates() {
  * Wrapper for IndexedDB cost management operations
  */
 const db = {
+
+    openCostsDB: openCostsDB,
+    getExchangeRates: getExchangeRates,
+
     /**
      * Adds a new cost record to the database
      * @param {Object} cost - Cost object with amount, currency, category, and description
@@ -60,9 +61,9 @@ const db = {
             return Promise.reject("Error: Sum must be a positive number.");
         }
         
-        const db = await openCostsDB();
+        const database = await openCostsDB();
         return new Promise((resolve, reject) => {
-            const transaction = db.transaction(["costs"], "readwrite");
+            const transaction = database.transaction(["costs"], "readwrite");
             const store = transaction.objectStore("costs");
 
             const item = {
@@ -88,11 +89,11 @@ const db = {
      * @returns {Promise<Object>} Report with costs and totals
      */
     getReport: async (targetCurrency = "USD", year = new Date().getFullYear(), month = new Date().getMonth() + 1) => {
-        const db = await openCostsDB();
+        const database = await openCostsDB();
         const rates = await getExchangeRates();
 
         return new Promise((resolve, reject) => {
-            const transaction = db.transaction(["costs"], "readonly");
+            const transaction = database.transaction(["costs"], "readonly");
             const store = transaction.objectStore("costs");
             const request = store.getAll();
 
@@ -141,11 +142,11 @@ const db = {
      * @returns {Promise<Object>} Category summary data
      */
     getCostsByCategory: async (year, month, targetCurrency = "USD") => {
-        const db = await openCostsDB();
+        const database = await openCostsDB();
         const rates = await getExchangeRates();
 
         return new Promise((resolve, reject) => {
-            const transaction = db.transaction(["costs"], "readonly");
+            const transaction = database.transaction(["costs"], "readonly");
             const store = transaction.objectStore("costs");
             const request = store.getAll();
 
@@ -192,11 +193,11 @@ const db = {
      * @returns {Promise<Object>} Annual data with monthly details
      */
     getAnnualReport: async (year, targetCurrency = "USD") => {
-        const db = await openCostsDB();
+        const database = await openCostsDB();
         const rates = await getExchangeRates();
 
         return new Promise((resolve, reject) => {
-            const transaction = db.transaction(["costs"], "readonly");
+            const transaction = database.transaction(["costs"], "readonly");
             const store = transaction.objectStore("costs");
             const request = store.getAll();
 
