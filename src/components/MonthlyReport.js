@@ -42,9 +42,9 @@ const MonthlyReport = () => {
         try {
             // Call the getReport function we created in db.js
             const result = await db.getReport(
+                params.currency,
                 Number(params.year),
-                Number(params.month),
-                params.currency
+                Number(params.month)
             );
             setReportData(result);
             
@@ -122,7 +122,7 @@ const MonthlyReport = () => {
                             <TableBody>
                                 {reportData.costs.map((cost, index) => (
                                     <TableRow key={index}>
-                                        <TableCell>{cost.date}</TableCell>
+                                        <TableCell>{cost.date.day}</TableCell>
                                         <TableCell>{cost.category}</TableCell>
                                         <TableCell>{cost.description}</TableCell>
                                         <TableCell align="right">{cost.sum} {cost.currency}</TableCell>
@@ -132,7 +132,7 @@ const MonthlyReport = () => {
                                 <TableRow sx={{ backgroundColor: '#e3f2fd' }}>
                                     <TableCell colSpan={3} sx={{ fontWeight: 'bold' }}>Total Cost (in {reportData.total.currency})</TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 'bold' }}>
-                                        {CURRENCY_SYMBOLS[reportData.total.currency]}{reportData.total.total}
+                                        {CURRENCY_SYMBOLS[reportData.total.currency]}{reportData.total.sum}
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

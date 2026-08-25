@@ -81,7 +81,7 @@ const db = {
      * @param {string} targetCurrency - Currency to convert amounts into
      * @returns {Promise<Object>} Report with costs and totals
      */
-    getReport: async (year, month, targetCurrency = "USD") => {
+    getReport: async (targetCurrency = "USD", year = new Date().getFullYear(), month = new Date().getMonth() + 1) => {
         const db = await openCostsDB();
         const rates = await getExchangeRates();
 
@@ -104,7 +104,7 @@ const db = {
                         currency: cost.currency,
                         category: cost.category,
                         description: cost.description,
-                        date: new Date(cost.createdAt).getDate() // Keep only the day of the month
+                        date: { day: new Date(cost.createdAt).getDate() } // Keep only the day of the month
                     };
                 });
 
@@ -119,7 +119,7 @@ const db = {
                     year,
                     month,
                     costs: processedCosts,
-                    total: { currency: targetCurrency, total: parseFloat(total.toFixed(2)) }
+                    total: { currency: targetCurrency, sum: parseFloat(total.toFixed(2)) }
                 });
             };
 
