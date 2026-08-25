@@ -4,7 +4,7 @@ import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 } from '@mui/material';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { idb } from '../idb';
+import { db } from '../db';
 
 // Define colors for the pie chart
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
@@ -40,8 +40,8 @@ const MonthlyReport = () => {
     // 4. Function to generate the report
     const handleGenerateReport = async () => {
         try {
-            // Call the getReport function we created in idb.js
-            const result = await idb.getReport(
+            // Call the getReport function we created in db.js
+            const result = await db.getReport(
                 Number(params.year),
                 Number(params.month),
                 params.currency
@@ -49,7 +49,7 @@ const MonthlyReport = () => {
             setReportData(result);
             
             // Retrieve category data for the pie chart
-            const categoryResult = await idb.getCostsByCategory(
+            const categoryResult = await db.getCostsByCategory(
                 Number(params.year),
                 Number(params.month),
                 params.currency

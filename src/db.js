@@ -1,4 +1,4 @@
-// src/idb.js
+// src/db.js
 // Unified IndexedDB module - supports both ES6 imports and vanilla JavaScript usage
 
 const dbName = "costsdb";
@@ -51,7 +51,7 @@ async function getExchangeRates() {
 /**
  * Wrapper for IndexedDB cost management operations
  */
-const idb = {
+const db = {
     /**
      * Adds a new cost record to the database
      * @param {Object} cost - Cost object with amount, currency, category, and description
@@ -241,9 +241,9 @@ const idb = {
 };
 
 // Export ES6 module (for React and modern bundlers)
-export { idb };
+export { db };
 
 // Attach to window for vanilla JavaScript usage (script tags)
 if (typeof window !== 'undefined') {
-    window.idb = idb;
+    window.db = db;
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button, MenuItem, Typography, Paper } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { idb } from '../idb';
+import { db } from '../db';
 
 const CURRENCY_SYMBOLS = {
     'USD': '$',
@@ -29,7 +29,7 @@ const AnnualReport = () => {
     // Function to generate the report
     const handleGenerateReport = async () => {
         try {
-            const result = await idb.getAnnualReport(
+            const result = await db.getAnnualReport(
                 Number(params.year),
                 params.currency
             );

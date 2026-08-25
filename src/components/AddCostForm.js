@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 // Import MUI components from the library
 import { TextField, Button, MenuItem, Box, Alert } from '@mui/material';
-import { idb } from '../idb'; // Import our database layer
+import { db } from '../db'; // Import our database layer
 
 const AddCostForm = () => {
     // Create state to manage form fields (React Standard)
@@ -24,8 +24,8 @@ const AddCostForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent page refresh
         try {
-            // Call the addCost function we created in idb.js
-            await idb.addCost(cost);
+            // Call the addCost function we created in db.js
+            await db.addCost(cost);
             setStatus({ type: 'success', msg: 'Cost added successfully!' });
             // Reset the form
             setCost({ sum: '', currency: 'USD', category: 'FOOD', description: '' });

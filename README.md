@@ -89,7 +89,7 @@ adding 2nd cost item succeeded
 ### Test Files
 
 - `public/test.html` – The test page that runs the IndexedDB tests
-- `public/idb-test.js` – Browser-compatible version of the idb library (for testing only, not the main module)
+- `public/db-test.js` – Browser-compatible version of the db library (for testing only, not the main module)
 
 ### Exchange Rates
 
