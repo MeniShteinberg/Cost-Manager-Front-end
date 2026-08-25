@@ -23,9 +23,6 @@ async function getExchangeRates() {
     return await response.json();
 }
 
-/**
- * Wrapper for IndexedDB cost management operations
- */
 const db = {
 
     getExchangeRates: getExchangeRates,
