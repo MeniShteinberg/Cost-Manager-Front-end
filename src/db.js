@@ -28,6 +28,11 @@ const db = {
     getExchangeRates: getExchangeRates,
 
     openCostsDB: function(databaseName = "costsdb", databaseVersion = 1) {
+
+        if (isNaN(databaseVersion)) {
+            throw new Error("Invalid database version");
+        }
+
         return {
 
     /**
@@ -36,6 +41,11 @@ const db = {
      * @returns {Promise<Object>} Added cost item
      */
     addCost: async (cost) => {
+
+        if (!cost || !cost.sum || !cost.currency || !cost.category || !cost.description) {
+            return Promise.reject("Error: Missing required cost fields.");
+        }
+
         const numericSum = Number(cost.sum);
         if (numericSum <= 0 || isNaN(numericSum)) {
             return Promise.reject("Error: Sum must be a positive number.");
@@ -68,6 +78,13 @@ const db = {
      */
     getReport: async (targetCurrency = "USD", year = new Date().getFullYear(), month = new Date().getMonth() + 1) => {
         const rates = await getExchangeRates();
+
+        if (!rates[targetCurrency]) throw new Error("Invalid target currency");
+
+        if (isNaN(year)) throw new Error("Invalid year");
+
+        if (isNaN(month) || month < 1 || month > 12) throw new Error("Invalid month");
+        
         const storedData = localStorage.getItem("costs");
         const allCosts = storedData ? JSON.parse(storedData) : [];
 
@@ -110,6 +127,11 @@ const db = {
      */
     getCostsByCategory: async (year, month, targetCurrency = "USD") => {
         const rates = await getExchangeRates();
+        if (!rates[targetCurrency]) throw new Error("Invalid target currency");
+
+        if (isNaN(year)) throw new Error("Invalid year");
+        if (isNaN(month) || month < 1 || month > 12) throw new Error("Invalid month");
+
         const storedData = localStorage.getItem("costs");
         const allCosts = storedData ? JSON.parse(storedData) : [];
 
@@ -150,6 +172,10 @@ const db = {
      */
     getAnnualReport: async (year, targetCurrency = "USD") => {
         const rates = await getExchangeRates();
+        if (!rates[targetCurrency]) throw new Error("Invalid target currency");
+
+        if (isNaN(year)) throw new Error("Invalid year");
+
         const storedData = localStorage.getItem("costs");
         const allCosts = storedData ? JSON.parse(storedData) : [];
 
