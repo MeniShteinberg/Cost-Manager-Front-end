@@ -2,7 +2,7 @@
 const DEFAULT_RATES_URL = "https://raw.githubusercontent.com/MeniShteinberg/Cost-Manager-Front-end/refs/heads/main/public/exchange-rates.json";
 
 
-let cachedRates = null;
+let cachedRates = { "USD": 1, "ILS": 3.4, "GBP": 0.6, "EURO": 0.7 };
 
 async function fetchExchangeRates() {
     const userUrl = localStorage.getItem("currency_url");
