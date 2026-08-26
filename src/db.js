@@ -1,31 +1,35 @@
 
 const DEFAULT_RATES_URL = "https://raw.githubusercontent.com/MeniShteinberg/Cost-Manager-Front-end/refs/heads/main/public/exchange-rates.json";
 
-/**
- * Fetches exchange rates from a user-defined URL or falls back to the default
- * @returns {Promise<Object>} Exchange rate object
- */
-async function getExchangeRates() {
-    const userUrl = localStorage.getItem("currency_url");
 
-    if (userUrl) {
-        try {
+let cachedRates = null;
+
+async function fetchExchangeRates() {
+    const userUrl = localStorage.getItem("currency_url");
+    try {
+        if (userUrl) {
             const response = await fetch(userUrl);
             if (response.ok) {
-                return await response.json();
+                cachedRates = await response.json();
+                return;
             }
-        } catch (e) {
-            console.error("Failed to fetch rates from the user URL, trying default");
         }
-    }
 
-    const response = await fetch(DEFAULT_RATES_URL);
-    return await response.json();
+        const defaultResponse = await fetch(DEFAULT_RATES_URL);
+        if (defaultResponse.ok) {
+            cachedRates = await defaultResponse.json();
+        }
+    } catch (e) {
+        console.error("Failed to fetch rates, keeping existing cached rates.");
+    }
 }
+
+fetchExchangeRates();
+setInterval(fetchExchangeRates, 1000 * 60 * 60);
 
 const db = {
 
-    getExchangeRates: getExchangeRates,
+    refreshRates: fetchExchangeRates,
 
     openCostsDB: function(databaseName = "costsdb", databaseVersion = 1) {
 
@@ -40,15 +44,15 @@ const db = {
      * @param {Object} cost - Cost object with amount, currency, category, and description
      * @returns {Promise<Object>} Added cost item
      */
-    addCost: async (cost) => {
+    addCost: (cost) => {
 
         if (!cost || !cost.sum || !cost.currency || !cost.category || !cost.description) {
-            return Promise.reject("Error: Missing required cost fields.");
+            throw new Error("Error: Missing required cost fields.");
         }
 
         const numericSum = Number(cost.sum);
         if (numericSum <= 0 || isNaN(numericSum)) {
-            return Promise.reject("Error: Sum must be a positive number.");
+            throw new Error("Error: Sum must be a positive number.");
         }
 
         const storedData = localStorage.getItem("costs");
@@ -76,8 +80,8 @@ const db = {
      * @param {string} targetCurrency - Currency to convert amounts into
      * @returns {Promise<Object>} Report with costs and totals
      */
-    getReport: async (targetCurrency = "USD", year = new Date().getFullYear(), month = new Date().getMonth() + 1) => {
-        const rates = await getExchangeRates();
+    getReport: (targetCurrency = "USD", year = new Date().getFullYear(), month = new Date().getMonth() + 1) => {
+        const rates = cachedRates;
 
         if (!rates[targetCurrency]) throw new Error("Invalid target currency");
 
@@ -125,8 +129,8 @@ const db = {
      * @param {string} targetCurrency - Currency to convert amounts into
      * @returns {Promise<Object>} Category summary data
      */
-    getCostsByCategory: async (year, month, targetCurrency = "USD") => {
-        const rates = await getExchangeRates();
+    getCostsByCategory: (year, month, targetCurrency = "USD") => {
+        const rates = cachedRates;
         if (!rates[targetCurrency]) throw new Error("Invalid target currency");
 
         if (isNaN(year)) throw new Error("Invalid year");
@@ -170,8 +174,8 @@ const db = {
      * @param {string} targetCurrency - Currency to convert amounts into
      * @returns {Promise<Object>} Annual data with monthly details
      */
-    getAnnualReport: async (year, targetCurrency = "USD") => {
-        const rates = await getExchangeRates();
+    getAnnualReport: (year, targetCurrency = "USD") => {
+        const rates = cachedRates;
         if (!rates[targetCurrency]) throw new Error("Invalid target currency");
 
         if (isNaN(year)) throw new Error("Invalid year");

@@ -21,7 +21,7 @@ const AddCostForm = () => {
     };
 
     // Submit function
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault(); // Prevent page refresh
 
         if (Number(cost.sum) <= 0) {
@@ -32,7 +32,7 @@ const AddCostForm = () => {
         try {
             // Call the addCost function we created in db.js
             const myDb = db.openCostsDB();
-            await myDb.addCost(cost);
+            myDb.addCost(cost);
             setStatus({ type: 'success', msg: 'Cost added successfully!' });
             // Reset the form
             setCost({ sum: '', currency: 'USD', category: 'FOOD', description: '' });

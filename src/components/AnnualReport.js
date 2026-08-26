@@ -27,10 +27,10 @@ const AnnualReport = () => {
     };
 
     // Function to generate the report
-    const handleGenerateReport = async () => {
+    const handleGenerateReport = () => {
         try {
             const myDb = db.openCostsDB();
-            const result = await myDb.getAnnualReport(
+            const result = myDb.getAnnualReport(
                 Number(params.year),
                 params.currency
             );

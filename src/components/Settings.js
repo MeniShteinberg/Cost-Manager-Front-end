@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, Typography, Alert } from '@mui/material';
+import { db } from '../db';
 
 const Settings = () => {
     const [url, setUrl] = useState('');
@@ -15,6 +16,8 @@ const Settings = () => {
         try {
             // Save to localStorage - it is preserved even if the page is refreshed
             localStorage.setItem('currency_url', url);
+            db.refreshRates();
+
             setStatus({ type: 'success', msg: 'URL saved successfully!' });
         } catch (e) {
             setStatus({ type: 'error', msg: 'Failed to save URL' });
