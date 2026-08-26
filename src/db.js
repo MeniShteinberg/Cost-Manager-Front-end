@@ -81,6 +81,11 @@ const db = {
      * @returns {Promise<Object>} Report with costs and totals
      */
     getReport: (targetCurrency = "USD", year = new Date().getFullYear(), month = new Date().getMonth() + 1) => {
+        
+        if (!cachedRates) {
+            throw new Error("Exchange rates are still loading, please try again in a moment.");
+        }
+
         const rates = cachedRates;
 
         if (!rates[targetCurrency]) throw new Error("Invalid target currency");
@@ -130,6 +135,11 @@ const db = {
      * @returns {Promise<Object>} Category summary data
      */
     getCostsByCategory: (year, month, targetCurrency = "USD") => {
+
+        if (!cachedRates) {
+            throw new Error("Exchange rates are still loading, please try again in a moment.");
+        }
+
         const rates = cachedRates;
         if (!rates[targetCurrency]) throw new Error("Invalid target currency");
 
@@ -175,6 +185,11 @@ const db = {
      * @returns {Promise<Object>} Annual data with monthly details
      */
     getAnnualReport: (year, targetCurrency = "USD") => {
+
+        if (!cachedRates) {
+            throw new Error("Exchange rates are still loading, please try again in a moment.");
+        }
+        
         const rates = cachedRates;
         if (!rates[targetCurrency]) throw new Error("Invalid target currency");
 
