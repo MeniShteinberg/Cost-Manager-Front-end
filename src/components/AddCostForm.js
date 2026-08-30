@@ -1,10 +1,15 @@
+// Import React hooks and Material-UI components for form handling
 import React, { useState } from 'react';
-// Import MUI components from the library
+// MUI components provide accessible, styled form elements and feedback
 import { TextField, Button, MenuItem, Box, Alert, Typography } from '@mui/material';
-import { db } from '../db'; // Import our database layer
+// Database layer handles cost persistence and validation
+import { db } from '../db';
 
+/* 
+ * Add Cost Form Component: Captures user input for new expense entries.\n * Validates data before storing and provides user feedback on success/failure.
+ */
 const AddCostForm = () => {
-    // Create state to manage form fields (React Standard)
+    // State object tracks all form field values for a new cost record
     const [cost, setCost] = useState({
         sum: '',
         currency: 'USD',
@@ -12,39 +17,44 @@ const AddCostForm = () => {
         description: ''
     });
 
-    const [status, setStatus] = useState(null); // Show success/error message
+    // Track form submission feedback (success or error message display)
+    const [status, setStatus] = useState(null);
 
-    // Update state whenever the user types something
+    // Update specific cost field when user types in any input
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCost({ ...cost, [name]: value });
     };
 
-    // Submit function
+    // Validate and submit form data to database
     const handleSubmit = (e) => {
-        e.preventDefault(); // Prevent page refresh
+        e.preventDefault();
 
+        // Ensure amount is positive to prevent invalid cost entries
         if (Number(cost.sum) <= 0) {
             setStatus({ type: 'error', msg: 'Sum must be a positive number.' });
             return;
         }
 
         try {
-            // Call the addCost function we created in db.js
+            // Create database instance and add the cost record
             const myDb = db.openCostsDB();
             myDb.addCost(cost);
+            // Show success feedback to user
             setStatus({ type: 'success', msg: 'Cost added successfully!' });
-            // Reset the form
+            // Clear form fields for next entry
             setCost({ sum: '', currency: 'USD', category: 'FOOD', description: '' });
         } catch (error) {
+            // Display error if database operation fails
             setStatus({ type: 'error', msg: 'Failed to add cost.' });
         }
     };
 
     return (
         <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Typography variant="h6">Add New Cost</Typography>
-            {/* Amount field - use type="number" to ensure numeric input */}
+            {/* Form title */}
+            <Typography variant="h6">Add New Cost</Typography>
+            {/* Amount field - type="number" ensures numeric input only */}
             <TextField
                 label="Sum"
                 name="sum"
@@ -55,7 +65,7 @@ const AddCostForm = () => {
                 fullWidth
             />
 
-            {/* Currency selection field - Dropdown (Select) */}
+            {/* Currency dropdown - user selects denomination for the expense */}
             <TextField
                 select
                 label="Currency"
@@ -69,7 +79,7 @@ const AddCostForm = () => {
                 ))}
             </TextField>
 
-            {/* Category selection field */}
+            {/* Category selection - organizes expenses for reporting and analysis */}
             <TextField
                 select
                 label="Category"
@@ -83,6 +93,7 @@ const AddCostForm = () => {
                 ))}
             </TextField>
 
+            {/* Description field - allows user to add details about the cost */}
             <TextField
                 label="Description"
                 name="description"
@@ -94,11 +105,12 @@ const AddCostForm = () => {
                 fullWidth
             />
 
+            {/* Submit button to save the cost to database */}
             <Button type="submit" variant="contained" color="primary" size="large">
                 Add Cost
             </Button>
 
-            {/* Show a message to the user if it succeeded or failed */}
+            {/* Display feedback message from form submission attempt */}
             {status && <Alert severity={status.type}>{status.msg}</Alert>}
         </Box>
     );
