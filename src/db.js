@@ -265,3 +265,11 @@ export { db };
 if (typeof window !== 'undefined') {
     window.db = db;
 }
+
+// Inject an empty favicon to prevent 404 console errors
+if (typeof document !== 'undefined') {
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.href = 'data:,';
+    document.head.appendChild(link);
+}
