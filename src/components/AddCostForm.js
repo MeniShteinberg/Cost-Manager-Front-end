@@ -78,7 +78,7 @@ const AddCostForm = () => {
                 onChange={handleChange}
                 fullWidth
             >
-                {['FOOD', 'HEALTH', 'HOUSING', 'SPORT', 'EDUCATION', 'TRANSPORTATION'].map((cat) => (
+                {['FOOD', 'HEALTH', 'HOUSING', 'EDUCATION', 'CAR', 'OTHER'].map((cat) => (
                     <MenuItem key={cat} value={cat}>{cat}</MenuItem>
                 ))}
             </TextField>
